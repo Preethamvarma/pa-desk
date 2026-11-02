@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#122038" />
+  <meta name="description" content="A private, simple personal assistant desk for reminders, events, file handovers and follow-ups." />
+  <title>PA Desk — Never miss a follow-up</title>
+  <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="./config.js" defer></script>
+  <script src="./cloud.js" defer></script>
+  <script src="./app.js" defer></script>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar" aria-label="Navigation">
+    <div class="brand"><div class="brand-mark" aria-hidden="true">P<span>✓</span></div><div><div class="brand-title">PA Desk</div><div class="brand-caption">Your command centre</div></div></div>
+    <div class="side-kicker">WORKSPACE</div>
+    <nav class="side-nav" id="sideNav">
+      <button class="nav-item active" data-filter="all"><span class="nav-ico">▦</span> All work <span class="nav-count" id="nav-all">0</span></button>
+      <button class="nav-item" data-filter="today"><span class="nav-ico">◷</span> Due today <span class="nav-count" id="nav-today">0</span></button>
+      <button class="nav-item" data-filter="overdue"><span class="nav-ico">!</span> Overdue <span class="nav-count" id="nav-overdue">0</span></button>
+      <button class="nav-item" data-filter="upcoming"><span class="nav-ico">▤</span> Upcoming <span class="nav-count" id="nav-upcoming">0</span></button>
+      <button class="nav-item" data-filter="inbox"><span class="nav-ico">✳</span> Unscheduled <span class="nav-count" id="nav-inbox">0</span></button>
+      <button class="nav-item" data-filter="done"><span class="nav-ico">✓</span> Completed <span class="nav-count" id="nav-done">0</span></button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="sidebar-tip"><span class="tip-sparkle">✳</span><strong>Capture now. Arrange later.</strong><p>Don't depend on memory for instructions.</p></div>
+      <div class="sidebar-foot"><span id="sidebarStorage">BROWSER-ONLY • NOT SYNCED</span></div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-label"><span class="online-dot"></span> PERSONAL ASSISTANT WORKSPACE</div>
+      <div class="topbar-actions"><span class="top-date" id="headerDate"></span><button type="button" class="outline-btn small account-btn" id="accountBtn" title="Account & cloud sync">☁ Set up cloud sync</button><button type="button" class="outline-btn small" id="installBtn" hidden>↓ Install app</button><button type="button" class="outline-btn small" id="enableAlertsBtn" title="Turn on notifications while the app is open">♧ Enable alerts</button></div>
+    </header>
+
+    <div class="content-wrap">
+      <div class="heading-row">
+        <div><div class="eyebrow">YOUR DAILY CONTROL ROOM</div><h1>Stay ahead of every <em>commitment.</em></h1><p class="subtitle">Track instructions, important occasions, file movements, and work that needs follow-up.</p></div>
+        <button id="newTaskBtn" class="primary-btn desktop-new" type="button"><span class="button-plus">+</span> New task</button>
+      </div>
+
+      <section class="capture-card" aria-labelledby="captureTitle">
+        <div class="capture-label"><span class="capture-icon">✦</span><h2 id="captureTitle">Quick capture</h2><span class="capture-tag">JUST TYPE THE INSTRUCTION</span></div>
+        <form id="quickForm" class="capture-form">
+          <label class="sr-only" for="quickText">Instruction</label>
+          <input id="quickText" maxlength="500" required autocomplete="off" placeholder="e.g. Handover the file to Ravi tomorrow at 11 AM" />
+          <button class="primary-btn capture-save" type="submit">Save instruction <span aria-hidden="true">→</span></button>
+        </form>
+        <p class="capture-help">Understands “today”, “tomorrow”, “day after tomorrow”, weekdays, dates and times. Without a time, it goes to Unscheduled.</p>
+      </section>
+
+      <div class="sync-panel" role="status"><span class="sync-icon" id="syncBadge">○ Local</span><span id="syncState">Browser-only mode. Sign in for cloud access.</span><button class="sync-action" type="button" id="manageAccountBtn">Manage account →</button></div>
+
+      <div id="alertInfo" class="info-strip" role="note"><span class="info-symbol">ⓘ</span><p><strong>Reliable reminders:</strong> Browser alerts work while this app is open. For alarms when it is closed, add important entries to your phone or Google Calendar.</p></div>
+
+      <section aria-label="Task overview" class="stats-grid">
+        <button class="stat-card" data-filter="overdue" type="button"><span class="stat-title"><span class="stat-dot red"></span> Overdue</span><div class="stat-number" id="statOverdue">0</div><span class="stat-foot">Needs your attention <span>↗</span></span></button>
+        <button class="stat-card" data-filter="today" type="button"><span class="stat-title"><span class="stat-dot amber"></span> Due today</span><div class="stat-number" id="statToday">0</div><span class="stat-foot">Stay on schedule <span>↗</span></span></button>
+        <button class="stat-card" data-filter="upcoming" type="button"><span class="stat-title"><span class="stat-dot blue"></span> Upcoming</span><div class="stat-number" id="statUpcoming">0</div><span class="stat-foot">Coming up next <span>↗</span></span></button>
+        <button class="stat-card" data-filter="inbox" type="button"><span class="stat-title"><span class="stat-dot purple"></span> Unscheduled</span><div class="stat-number" id="statInbox">0</div><span class="stat-foot">Add a reminder time <span>↗</span></span></button>
+      </section>
+
+      <section class="work-layout" aria-label="Work and reminders">
+        <div class="work-panel">
+          <div class="section-head"><div><div class="eyebrow mini">KEEP THINGS MOVING</div><h2 id="listTitle">Your worklist</h2></div><button id="mobileNewBtn" class="outline-btn mobile-new" type="button">+ New task</button></div>
+          <div class="filter-toolbar"><div class="tab-strip" role="group" aria-label="Filter work"><button class="tab active" data-filter="all">All</button><button class="tab" data-filter="today">Today</button><button class="tab" data-filter="upcoming">Upcoming</button><button class="tab" data-filter="inbox">Unscheduled</button><button class="tab" data-filter="done">Done</button></div><label class="search-wrap"><span>⌕</span><input id="searchInput" placeholder="Search work…" aria-label="Search work" /></label></div>
+          <div id="taskList" class="task-list" aria-live="polite"></div>
+        </div>
+        <aside class="right-column" aria-label="Planning tools">
+          <section class="side-card next-card"><div class="side-card-head"><span class="side-card-glyph">◷</span><h3>Coming up next</h3></div><div id="nextList" class="next-list"></div></section>
+          <section class="side-card discipline-card"><span class="mini-eyebrow">THE PA'S RULE</span><h3>Nothing stays in your head.</h3><p>Capture every verbal instruction. Give it a date and time. Check what's pending. Mark it done.</p><div class="rule-steps"><span>01 Capture</span><span>02 Schedule</span><span>03 Complete</span></div></section>
+          <section class="side-card utilities-card"><div class="side-card-head"><span class="side-card-glyph">⇩</span><h3>Backups & tools</h3></div><p id="backupNotice">Tasks are saved only in this browser. Sign in to sync across devices.</p><div class="tool-actions"><button id="exportBtn" type="button" class="tool-btn">↓ Export backup (.json)</button><button id="importBtn" type="button" class="tool-btn">↑ Restore backup (.json)</button><button id="calendarExportBtn" type="button" class="tool-btn">▤ Export calendar (.ics)</button><button id="testAlertBtn" type="button" class="tool-btn">♧ Test notification</button></div><input id="importFile" class="sr-only" type="file" accept="application/json,.json" /></section>
+        </aside>
+      </section>
+      <footer class="app-footer"><span>PA Desk — Clear instructions. Timely action.</span><span>Times shown in your device's local timezone.</span></footer>
+    </div>
+  </main>
+</div>
+
+<div id="modalBackdrop" class="modal-backdrop" hidden>
+  <section class="task-modal" role="dialog" aria-modal="true" aria-labelledby="modalHeading">
+    <header class="modal-head"><div><div class="eyebrow mini">SAVE THE DETAILS</div><h2 id="modalHeading">Create a task</h2></div><button id="closeModalBtn" class="close-btn" aria-label="Close dialog" type="button">×</button></header>
+    <form id="taskForm" class="task-form">
+      <input type="hidden" id="taskId" />
+      <div class="form-field full"><label for="taskTitle">Instruction / title <span class="required">*</span></label><input id="taskTitle" required maxlength="500" placeholder="e.g. Remind officer about the marriage" /></div>
+      <div class="form-grid">
+        <div class="form-field"><label for="taskType">Type of work</label><select id="taskType"><option value="reminder">Reminder</option><option value="event">Event / Function</option><option value="handover">File handover</option><option value="followup">Follow-up</option><option value="task">Other task</option></select></div>
+        <div class="form-field"><label for="taskPriority">Priority</label><select id="taskPriority"><option value="normal">Normal</option><option value="high">High / Urgent</option><option value="low">Low</option></select></div>
+        <div class="form-field ordinary-fields"><label for="taskDateTime">Reminder date & time</label><input id="taskDateTime" type="datetime-local" /><small id="dateHintHelp">Leave empty to keep in Unscheduled.</small></div>
+        <div class="form-field ordinary-fields"><label for="taskAdvance">Alert before due time</label><select id="taskAdvance"><option value="0">At due time only</option><option value="5">5 minutes before</option><option value="15">15 minutes before</option><option value="30" selected>30 minutes before</option><option value="60">1 hour before</option><option value="1440">1 day before</option></select></div>
+        <div class="form-field event-fields" hidden><label for="taskEventDate">Event / function date <span class="required">*</span></label><input id="taskEventDate" type="date" /><small>The actual date of the marriage / occasion.</small></div>
+        <div class="form-field event-fields" hidden><label for="taskEventTime">Event time (optional)</label><input id="taskEventTime" type="time" /><small>Leave empty if the event's start time is unknown.</small></div>
+        <div class="form-field full event-fields" hidden><label for="taskEventReminder">Remind on date & time <span class="required">*</span></label><input id="taskEventReminder" type="datetime-local" /><small>Defaults to the previous day at 5:00 PM. You may change both date and time.</small></div>
+        <div class="form-field"><label for="taskPerson">Person / contact</label><input id="taskPerson" maxlength="150" placeholder="e.g. Sri Ravi, Section Officer" /></div>
+        <div class="form-field ordinary-fields"><label for="taskRepeat">Repeat</label><select id="taskRepeat"><option value="none">Does not repeat</option><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option></select></div>
+        <div class="form-field full"><label for="taskLocation">Venue / file reference (optional)</label><input id="taskLocation" maxlength="200" placeholder="e.g. Office chamber / file no. (avoid confidential details)" /></div>
+        <div class="form-field full"><label for="taskNotes">Notes / next action</label><textarea id="taskNotes" rows="3" maxlength="2000" placeholder="Anything needed to act on this instruction…"></textarea></div>
+      </div>
+      <div class="modal-foot"><button id="cancelModalBtn" type="button" class="outline-btn">Cancel</button><button type="submit" class="primary-btn" id="taskSaveBtn">Save task</button></div>
+    </form>
+  </section>
+</div>
+<div id="authBackdrop" class="modal-backdrop" hidden>
+  <section class="auth-modal" role="dialog" aria-modal="true" aria-labelledby="authHeading">
+    <header class="modal-head"><div><div class="eyebrow mini">ONE ACCOUNT · ALL DEVICES</div><h2 id="authHeading">Cloud sync & account</h2></div><button type="button" id="closeAuthBtn" class="close-btn" aria-label="Close account dialog">×</button></header>
+    <div class="auth-content"><p id="authStatus">Sign in to sync tasks across your browsers and phones.</p>
+      <form id="authForm" class="auth-form">
+        <label for="authEmail">Email</label><input id="authEmail" type="email" required autocomplete="email" placeholder="your@email.com" />
+        <label for="authPassword">Password</label><input id="authPassword" type="password" required minlength="8" autocomplete="current-password" placeholder="8+ characters" />
+        <button id="authSubmit" class="primary-btn" type="submit">Sign in</button>
+      </form>
+      <button id="registerBtn" class="outline-btn" type="button">Create an account</button>
+      <div class="auth-tools"><button id="syncNowBtn" type="button" class="outline-btn" hidden>↻ Sync now</button><button id="importLegacyBtn" type="button" class="outline-btn" hidden>↑ Import existing local tasks</button><button id="signOutBtn" type="button" class="outline-btn" hidden>Sign out</button></div>
+      <p class="privacy-hint">Use the same login on every browser. Changes require an internet connection to synchronize. Do not enter classified or confidential official records without approved security controls.</p>
+    </div>
+  </section>
+</div>
+<div class="toast-stack" id="toastStack" role="status" aria-live="polite"></div>
+</body>
+</html>

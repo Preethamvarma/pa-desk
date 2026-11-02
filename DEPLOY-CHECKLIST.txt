@@ -1,0 +1,16 @@
+PA DESK V2 — FIVE STEP CHECKLIST
+
+1. Create a Supabase project (supabase.com/dashboard).
+2. Paste the entire supabase-schema.sql into its SQL Editor and run.
+3. Update config.js with your Supabase URL and PUBLISHABLE key only.
+4. Replace existing GitHub Pages repo files with the v2 files (same URL).
+5. On the ORIGINAL browser: back up v1 tasks, sign in, choose Import browser-only tasks; on your mobile use the same login.
+
+ANDROID: Open GitHub Pages URL in Chrome → ⋮ → Install app.
+
+REMINDERS WHEN APP IS CLOSED: Export .ics, import it to phone calendar and enable alerts.
+An APK alone would not make background notifications reliable.
+
+Example: Event 22-Nov-2026 → Reminder 21-Nov-2026, 5:00 PM local time.
+
+NOTE: No live cloud data sync until steps 1–3 have been completed.
